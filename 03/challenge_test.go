@@ -2,18 +2,18 @@ package main
 
 import "testing"
 
-func Test_funcName(t *testing.T) {
+func Test_ReadInstructions(t *testing.T) {
 	tests := []struct {
-		name     string
-		paramA   []string
-		wantRetA int
+		name         string
+		instructions []string
+		wantsharedIn int
 	}{
-		// Test Cases
+		{"example 1-1", []string{"#1 @ 1,3: 4x4", "#2 @ 3,1: 4x4", "#3 @ 5,5: 2x2"}, 4},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotRetA := funcName(tt.paramA); gotRetA != tt.wantRetA {
-				t.Errorf("funcName() = %v, want %v", gotRetA, tt.wantRetA)
+			if gotsharedIn := ReadInstructions(tt.instructions); gotsharedIn != tt.wantsharedIn {
+				t.Errorf("ReadInstructions() sharedIn: got %v, wanted %v", gotsharedIn, tt.wantsharedIn)
 			}
 		})
 	}

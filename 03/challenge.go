@@ -3,24 +3,42 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strconv"
-	"strings"
+	sc "strconv"
+	s "strings"
 )
 
-// funcName :
+// ReadInstructions :
 //  	parameters:
-//  		paramA: description
+//  		instructions: instructions for requested squares of fabric
 //  	return values:
-//  		retA: description
-func funcName(paramA []string) (retA int) {
+//  		sharedIn: Number of shared square inches
+func ReadInstructions(instructions []string) (sharedIn int) {
+	var fabric [1000][1000]int
+
+	for _, inst := range instructions {
+		i := s.Split(inst, " ")
+		xOff, _ := sc.Atoi(i[2][:s.Index(i[2], ",")])
+		yOff, _ := sc.Atoi(i[2][s.Index(i[2], ",")+1 : len(i[2])-1])
+		xSize, _ := sc.Atoi(i[3][:s.Index(i[3], "x")])
+		ySize, _ := sc.Atoi(i[3][s.Index(i[3], "x")+1:])
+
+		for x := 0; x < xSize; x++ {
+			for y := 0; y < ySize; y++ {
+				fabric[xOff+x][yOff+y]++
+				if fabric[xOff+x][yOff+y] == 2 {
+					sharedIn++
+				}
+			}
+		}
+	}
 
 	return
 }
 
 func main() {
 	data, _ := ioutil.ReadFile("./input")
-	retA := funcName(strings.Split(string(data), "\r\n"))
-	output := "retA: " + strconv.Itoa(retA) + "\n"
+	sharedIn := ReadInstructions(s.Split(string(data), "\r\n"))
+	output := "shared inches: " + sc.Itoa(sharedIn) + "\n"
 	fmt.Println(output)
 	ioutil.WriteFile("./output", []byte(output), 0644)
 }
