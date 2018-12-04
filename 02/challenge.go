@@ -11,9 +11,9 @@ import (
 // FindChecksum :
 //  	parameters:
 //  		boxes: string slice, containing list of box IDs
-//  	return values:
-//  		checksum: checksum of all boxes
-func FindChecksum(boxes []string) (checksum int) {
+//  		Channels:
+//  			checksumChan: channel for sending back checksum of all boxes
+func FindChecksum(boxes []string, checksumChan chan int) {
 	doubles := 0
 	triples := 0
 
@@ -36,22 +36,21 @@ func FindChecksum(boxes []string) (checksum int) {
 		}
 	}
 
-	checksum = doubles * triples
-	return
+	checksumChan <- doubles * triples
 }
 
 // FindSimilar :
 //  	parameters:
 //  		boxes: string slice, containing list of box IDs
-//  	return values:
-//  		similar: list of characters shared between the two most similar strings
-func FindSimilar(boxes []string) (similar string) {
+//  		Channels:
+//  			similarChan: channel for sending back list of characters shared between the two most similar strings
+func FindSimilar(boxes []string, similarChan chan string) {
 	sort.Strings(boxes)
 
 	for i := 0; i < len(boxes)-1; i++ {
 		foundDiff := 0
 		for j := i + 1; j < len(boxes); j++ {
-			similar = boxes[i]
+			similar := boxes[i]
 			for k := 0; k < len(boxes[i]); k++ {
 				if boxes[i][k] != boxes[j][k] {
 					if foundDiff > 0 {
@@ -63,18 +62,21 @@ func FindSimilar(boxes []string) (similar string) {
 				}
 			}
 			if foundDiff == 1 {
+				similarChan <- similar
 				return
 			}
 		}
 	}
-	return ""
+	similarChan <- ""
 }
 
 func main() {
 	data, _ := ioutil.ReadFile("./input")
-	checksum := FindChecksum(strings.Split(string(data), "\r\n"))
-	similar := FindSimilar(strings.Split(string(data), "\r\n"))
-	output := "checksum: " + strconv.Itoa(checksum) + "\nsimilar characters: " + similar + "\n"
+	checksum := make(chan int)
+	similar := make(chan string)
+	go FindChecksum(strings.Split(string(data), "\n"), checksum)
+	go FindSimilar(strings.Split(string(data), "\n"), similar)
+	output := "checksum: " + strconv.Itoa(<-checksum) + "\nsimilar characters: " + <-similar + "\n"
 	fmt.Println(output)
 	ioutil.WriteFile("./output", []byte(output), 0644)
 }
