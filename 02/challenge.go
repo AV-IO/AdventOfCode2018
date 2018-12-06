@@ -27,6 +27,9 @@ func FindChecksum(boxes []string, checksumChan chan int) {
 			} else if count == 3 {
 				seenTriple = true
 			}
+			if seenDouble && seenTriple {
+				break
+			}
 		}
 		if seenDouble {
 			doubles++
