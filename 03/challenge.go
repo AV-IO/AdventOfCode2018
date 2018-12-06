@@ -10,10 +10,12 @@ import (
 // ReadInstructions :
 //  	parameters:
 //  		instructions: instructions for requested squares of fabric
-//  	return values:
-//  		sharedIn: Number of shared square inches
-func ReadInstructions(instructions []string) (sharedIn int) {
+//		return values:
+//  		sharedIn: the number of shared square inches
+func ReadInstructions(instructions []string) (sharedIn int, lonePatch int) {
 	var fabric [1000][1000]int
+	fab := map[[2]int][]int{}
+	fab[[2]int{2, 2}] = []int{4}
 
 	for _, inst := range instructions {
 		i := s.Split(inst, " ")
