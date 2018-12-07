@@ -7,7 +7,7 @@ import (
 	s "strings"
 )
 
-//	ReadInstructions :
+// ReadInstructions :
 //		parameters:
 //			instructions: instructions for requested squares of fabric
 //		return values:
@@ -30,16 +30,21 @@ func ReadInstructions(instructions []string) (sharedIn int, intactPatch int) {
 		for x := 0; x < xSize; x++ {
 			for y := 0; y < ySize; y++ {
 				coord := [2]int{xOff + x, yOff + y} // Go: MaP vAlUeS aReN't AdDrEsSaBlE wItH pOiNtErS
-				fabric[coord] = append(fabric[coord], instN)
+				fabric[coord] = append(fabric[coord], instN+1)
 				if len(fabric[coord]) == 2 {
 					sharedIn++
 					delete(intactPatches, fabric[coord][0])
 					delete(intactPatches, fabric[coord][1])
 				} else if len(fabric[coord]) > 2 {
-					delete(intactPatches, fabric[coord][len(fabric[coord])])
+					delete(intactPatches, fabric[coord][len(fabric[coord])-1])
 				}
 			}
 		}
+	}
+
+	for key := range intactPatches {
+		intactPatch = key // just getting the first value
+		break
 	}
 
 	return
