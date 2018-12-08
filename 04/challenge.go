@@ -28,7 +28,7 @@ func funcName(rawLogs []string) (retA int) {
 	// Somewhat state-machine like
 	// This could probably be better done by traversing lines up and down, but I want to do it this way
 	// Maybe this would be solved better more functionally
-	guardTimes := make(map[string]int)
+	guardTimes := make(map[string][]int)
 	currentGuard := ""
 	time := 0
 	for _, l := range parsedLogs {
@@ -39,16 +39,28 @@ func funcName(rawLogs []string) (retA int) {
 			time, _ = sc.Atoi(l[1][3:])
 		case "wakes":
 			awakeTime, _ := sc.Atoi(l[1][3:])
-			guardTimes[currentGuard] += awakeTime - time
+			for ; time < awakeTime; time++ {
+				guardTimes[currentGuard] = append(guardTimes[currentGuard], time)
+			}
 		}
 	}
 
 	// finding which guard spent the most time sleeping
 	time = 0
 	for key, val := range guardTimes {
-		if val > time {
+		if len(val) > time {
 			currentGuard = key
-			time = val
+			time = len(val)
+		}
+	}
+
+	// finding most common hour asleep
+	sort.Ints(guardTimes[currentGuard])
+	for i, _ := range guardTimes[currentGuard] {
+
+		guardTimes[currentGuard][i]
+		if count > time {
+			time = count
 		}
 	}
 
