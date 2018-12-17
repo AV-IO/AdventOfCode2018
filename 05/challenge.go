@@ -48,13 +48,13 @@ func FindProblemUnit(inPolymer string, ProblemUnit chan string, outFixedPolyLen 
 	polyLenTest := make(chan int)
 
 	var unit string
-	var len int
+	len := len(inPolymer)
 
 	for i := 0; i < 26; i++ {
 		outPolymer := s.Replace(inPolymer, string(97+i), "", -1)
 		outPolymer = s.Replace(outPolymer, string(65+i), "", -1)
 
-		AlchemicalReduction(outPolymer, polyLenTest)
+		go AlchemicalReduction(outPolymer, polyLenTest)
 
 		lenTest := <-polyLenTest
 		if lenTest < len {

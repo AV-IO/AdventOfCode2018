@@ -22,7 +22,7 @@ func TestAlchemicalReduction(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AlchemicalReduction(tt.param.inPolymer, tt.param.outPolyLen)
+			go AlchemicalReduction(tt.param.inPolymer, tt.param.outPolyLen)
 			if gotPolyLen := <-tt.param.outPolyLen; gotPolyLen != tt.wantPolyLen {
 				t.Errorf(
 					"AlchemicalReduction() outPolyLen: got %v, wanted %v)",
@@ -50,7 +50,7 @@ func TestFindProblemUnit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			FindProblemUnit(tt.param.inPolymer, tt.param.ProblemUnit, tt.param.outFixedPolyLen)
+			go FindProblemUnit(tt.param.inPolymer, tt.param.ProblemUnit, tt.param.outFixedPolyLen)
 			gotProblem := <-tt.param.ProblemUnit
 			gotPolyLen := <-tt.param.outFixedPolyLen
 			if gotProblem != tt.wantProblem {
