@@ -3,15 +3,18 @@ package main
 import "testing"
 
 func Test_findSleepTime(t *testing.T) {
+	type parameters struct {
+		rawLogs []string
+	}
 	tests := []struct {
 		name               string
-		rawLogs            []string
+		param              parameters
 		wantmostAsleep     int
 		wantfrequentMinute int
 	}{
 		{
 			"example 1-1",
-			[]string{
+			parameters{[]string{
 				"[1518-11-01 00:00] Guard #10 begins shift",
 				"[1518-11-01 00:05] falls asleep",
 				"[1518-11-01 00:25] wakes up",
@@ -29,14 +32,14 @@ func Test_findSleepTime(t *testing.T) {
 				"[1518-11-05 00:03] Guard #99 begins shift",
 				"[1518-11-05 00:45] falls asleep",
 				"[1518-11-05 00:55] wakes up",
-			},
+			}},
 			240,
 			4455,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotmostAsleep, gotfrequentMinute := findSleepTime(tt.rawLogs)
+			gotmostAsleep, gotfrequentMinute := findSleepTime(tt.param.rawLogs)
 			if gotmostAsleep != tt.wantmostAsleep {
 				t.Errorf("findSleepTime() mostAsleep: got %v, wanted %v", gotmostAsleep, tt.wantmostAsleep)
 			}
