@@ -1,36 +1,37 @@
 package tree
 
-import (
-	"fmt"
-)
-
 // Node is used for a node within a Tree
 // Node consists of a list of pointers to children nodes, and a list of ints cointaining metadata
 type Node struct {
-	Children []*Node
+	ID       int
+	Children []int
 	Metadata []int
 }
 
 // Tree is a list of nodes, and a pointer to the Root.
 type Tree struct {
-	nodes []Node
-	Root  *Node
+	nodes  map[int]Node
+	RootID int
 }
 
-// AddNode : Adds a node to the existing tree under the ptr node with blank children and blank metadata.
-func (t *Tree) AddNode(ptr *Node) (newPtr *Node) {
-	// TODO: check if default initialization is ok to append to.
-	t.nodes = append(
-		t.nodes,
-		Node{[]*Node{}, []int{}},
-	)
-	newPtr = &t.nodes[len(t.nodes)-1]
+var idCounter int
 
-	if ptr != nil {
-		ptr.Children = append(ptr.Children, newPtr)
+// AddNode : Adds a node to the existing tree under the ptr node with blank children and blank metadata.
+func (t *Tree) AddNode(parentID int) (newID int) {
+	newID = idCounter
+	t.nodes[newID] = Node{newID, []int{}, []int{}}
+
+	if parentID != newID {
+		t.nodes[parentID] = Node{ // Go: CaNnOt AsSiGn To StRuCt FiElD iN mAp
+			parentID,
+			append(t.nodes[parentID].Children, newID),
+			t.nodes[parentID].Metadata,
+		}
 	} else {
-		t.Root = newPtr
+		t.RootID = 0
 	}
+
+	idCounter++
 	return
 }
 
@@ -42,11 +43,4 @@ func (t *Tree) MetadataSum() (sum int) {
 		}
 	}
 	return
-}
-
-// PrintConnectionCount : prints list of all child connections
-func (t *Tree) PrintConnectionCount() {
-	for _, n := range t.nodes {
-		fmt.Println(len(n.Children))
-	}
 }
