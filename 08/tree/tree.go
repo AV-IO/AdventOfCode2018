@@ -8,17 +8,23 @@ type Node struct {
 	Metadata []int
 }
 
-// Tree is a list of nodes, and a pointer to the Root.
+// Tree is a map of IDs to nodes, and a pointer to the Root, and an internal counter for treeIDs
 type Tree struct {
-	nodes  map[int]Node
-	RootID int
+	RootID    int
+	nodes     map[int]Node
+	idCounter int
 }
 
-var idCounter int
+// NewTree : creates and initializes a new Tree
+func NewTree() (t *Tree) {
+	t = new(Tree)
+	t.nodes = make(map[int]Node)
+	return
+}
 
-// AddNode : Adds a node to the existing tree under the ptr node with blank children and blank metadata.
+// AddNode : Adds a node to the existing Tree under the ptr node with blank children and blank metadata.
 func (t *Tree) AddNode(parentID int) (newID int) {
-	newID = idCounter
+	newID = t.idCounter
 	t.nodes[newID] = Node{newID, []int{}, []int{}}
 
 	if parentID != newID {
@@ -31,8 +37,17 @@ func (t *Tree) AddNode(parentID int) (newID int) {
 		t.RootID = 0
 	}
 
-	idCounter++
+	t.idCounter++
 	return
+}
+
+// AddMetadata : Adds metadata to the specified node
+func (t *Tree) AddMetadata(nodeID int, metadata []int) {
+	t.nodes[nodeID] = Node{
+		nodeID,
+		t.nodes[nodeID].Children,
+		metadata,
+	}
 }
 
 // MetadataSum : gets total sum of all metadata in tree

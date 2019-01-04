@@ -14,10 +14,8 @@ import (
 //		return values:
 //			sum: sum of all metadata values in tree
 func readTree(treeData []int) (sum int) {
-	var t tree.Tree
-	ptrStack := []*tree.Node{}
-	instructionReadRec(&t, ptrStack, treeData, 0)
-	t.PrintConnectionCount()
+	t := tree.NewTree()
+	instructionReadRec(t, 0, treeData, 0)
 	sum = t.MetadataSum()
 	return
 }
@@ -32,30 +30,22 @@ func readTree(treeData []int) (sum int) {
 //			newTreeDataIndex: updated location in treeData
 func instructionReadRec(
 	t *tree.Tree,
-	ptrStack []*tree.Node,
-	treeData []int,
+	parentID int,
+	treeData []int, // only slice header is passed by copy
 	treeDataIndex int,
 ) (newTreeDataIndex int) {
 	childrenCount := treeData[treeDataIndex]
 	metadataCount := treeData[treeDataIndex+1]
 	treeDataIndex += 2
 
-	// Add new node, and add node pointer to ptrStack
-	var newPtr *tree.Node
-	if len(ptrStack) == 0 {
-		newPtr = t.AddNode(nil)
-	} else {
-		newPtr = t.AddNode(ptrStack[len(ptrStack)-1])
-	}
-	ptrStack = append(ptrStack, newPtr)
+	// Add new node
+	ID := t.AddNode(parentID)
 
 	for i := 0; i < childrenCount; i++ { // For each child, call recursive
-		treeDataIndex = instructionReadRec(t, ptrStack, treeData, treeDataIndex)
+		treeDataIndex = instructionReadRec(t, ID, treeData, treeDataIndex)
 	}
-	for i := 0; i < metadataCount; i++ { // For each metadata, add to metadata list.
-		newPtr.Metadata = append(newPtr.Metadata, treeData[treeDataIndex])
-		treeDataIndex++
-	}
+	t.AddMetadata(ID, treeData[treeDataIndex:treeDataIndex+metadataCount]) // Add metadata to node
+	treeDataIndex += metadataCount
 
 	return treeDataIndex
 }
