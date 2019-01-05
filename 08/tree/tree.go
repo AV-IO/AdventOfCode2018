@@ -59,3 +59,25 @@ func (t *Tree) MetadataSum() (sum int) {
 	}
 	return
 }
+
+// NodeValue : gets the value of the node
+func (t *Tree) NodeValue(nodeID int) (val int) {
+	t.nodeValRec(nodeID, &val)
+	return
+}
+
+// nodeValRec : recursive function called by NodeValue used for calcualting value of nodes
+func (t *Tree) nodeValRec(nodeID int, val *int) {
+	for _, m := range t.nodes[nodeID].Metadata {
+		if m != 0 && m < len(t.nodes[nodeID].Children) {
+			n := t.nodes[nodeID].Children[m-1]
+			if len(t.nodes[n].Children) > 0 {
+				t.nodeValRec(n, val)
+			} else {
+				for _, v := range t.nodes[n].Metadata {
+					*val += v
+				}
+			}
+		}
+	}
+}

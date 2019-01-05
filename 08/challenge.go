@@ -13,25 +13,27 @@ import (
 //  		treeData: list of ints continating instructions for forming the tree
 //		return values:
 //			sum: sum of all metadata values in tree
-func readTree(treeData []int) (sum int) {
+func readTree(treeData []int) (sum int, val int) {
 	t := tree.NewTree()
 	instructionReadRec(t, 0, treeData, 0)
 	sum = t.MetadataSum()
+	val = t.NodeValue(t.RootID)
 	return
 }
 
 //	instructionReadRec :
 //		parameters:
 //			t: tree
-//			ptrStack: pointer stack for tracking location in tree
+//			parentID: ID of the parent node which called the function
 //			treeData: list of data for importing into tree
+//				only slice header is passed by copy, so not space-intensive
 //			treeDataIndex: current location in treeData
 //		return values:
 //			newTreeDataIndex: updated location in treeData
 func instructionReadRec(
 	t *tree.Tree,
 	parentID int,
-	treeData []int, // only slice header is passed by copy
+	treeData []int,
 	treeDataIndex int,
 ) (newTreeDataIndex int) {
 	childrenCount := treeData[treeDataIndex]
@@ -58,8 +60,8 @@ func main() {
 		treeData = append(treeData, nint)
 	}
 
-	sum := readTree(treeData)
-	output := "sum of treeData: " + sc.Itoa(sum) + "\n"
+	sum, val := readTree(treeData)
+	output := "sum of treeData: " + sc.Itoa(sum) + "\nvalue of root node: " + sc.Itoa(val) + "\n"
 	fmt.Println(output)
 	ioutil.WriteFile("./output", []byte(output), 0644)
 }
