@@ -67,7 +67,7 @@ func TestTree_NodeValue(t *testing.T) {
 	tr2 := &Tree{
 		RootID: 0,
 		nodes: map[int]Node{
-			0: Node{ID: 0, Children: []int{1, 2, 4}, Metadata: []int{1, 1, 2}},
+			0: Node{ID: 0, Children: []int{1, 2, 4}, Metadata: []int{1, 2, 3}},
 			1: Node{ID: 1, Children: []int{}, Metadata: []int{1, 2, 3}},
 			2: Node{ID: 2, Children: []int{3}, Metadata: []int{2}},
 			3: Node{ID: 3, Children: []int{}, Metadata: []int{99}},
