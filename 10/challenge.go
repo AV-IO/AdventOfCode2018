@@ -11,6 +11,50 @@ import (
 	"time"
 )
 
+func interactive(s *sky.Sky, status chan string, done chan bool) {
+	stepSize := 8
+	playing := false
+	for {
+		select {
+		case instruction, stayAlive := <-status: //TODO: check if non-blocking close will work.
+			if !stayAlive {
+				done <- true
+				return
+			}
+			switch instruction {
+			case " ":
+				if playing {
+					playing = false
+				} else {
+					playing = true
+				}
+			case "f":
+				if stepSize < 0 {
+					stepSize *= -1
+				}
+				s.PassTime(stepSize)
+				fmt.Println(s.ToString())
+			case "r":
+				if stepSize > 0 {
+					stepSize *= -1
+				}
+				s.PassTime(stepSize)
+				fmt.Println(s.ToString())
+			case "d":
+				stepSize /= 2
+			case "u":
+				stepSize *= 2
+			}
+		default:
+			if playing {
+				s.PassTime(stepSize)
+				fmt.Println(s.ToString())
+				time.Sleep(100 * time.Millisecond) // helps run at a watchable timeframe
+			}
+		}
+	}
+}
+
 func findEndSky(s *sky.Sky) (endSky string) {
 	fmt.Println(
 		"Keyboard Input:\n" +
@@ -23,57 +67,18 @@ func findEndSky(s *sky.Sky) (endSky string) {
 			"\nPress Space to start\n\n",
 	)
 
-	statusChan := make(chan string)
+	status := make(chan string)
 	done := make(chan bool)
 
-	go func() {
-		stepSize := 8
-		playing := false
-		for {
-			select {
-			case instruction, stayAlive := <-statusChan: //TODO: check if non-blocking close will work.
-				if !stayAlive {
-					done <- true
-					return
-				}
-				switch instruction {
-				case " ":
-					if playing {
-						playing = false
-					} else {
-						playing = true
-					}
-				case "f":
-					if stepSize < 0 {
-						stepSize *= -1
-					}
-					s.PassTime(stepSize)
-				case "r":
-					if stepSize > 0 {
-						stepSize *= -1
-					}
-					s.PassTime(stepSize)
-				case "d":
-					stepSize /= 2
-				case "u":
-					stepSize *= 2
-				}
-			default:
-				if playing {
-					s.PassTime(stepSize)
-					time.Sleep(100 * time.Millisecond) // helps run at a watchable timeframe
-				}
-			}
-		}
-	}()
+	go interactive(s, status, done)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		switch scanner.Text() {
 		case " ", "f", "r", "d", "u":
-			statusChan <- scanner.Text()
+			status <- scanner.Text()
 		case "e":
-			close(statusChan)
+			close(status)
 			break
 		}
 	}
